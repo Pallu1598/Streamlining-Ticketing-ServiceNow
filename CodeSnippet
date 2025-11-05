@@ -1,0 +1,25 @@
+// Business Rule: Auto-Assign Incident to appropriate group based on Category
+(function executeRule(current, previous /*null when async*/) {
+
+    // Example: Assign ticket based on category
+    if (current.category == 'network') {
+        current.assignment_group.setDisplayValue('Network Support');
+    } 
+    else if (current.category == 'hardware') {
+        current.assignment_group.setDisplayValue('Hardware Team');
+    } 
+    else if (current.category == 'software') {
+        current.assignment_group.setDisplayValue('Application Support');
+    }
+
+    // Auto-assign ticket to group lead
+    if (!current.assigned_to) {
+        var grUser = new GlideRecord('sys_user');
+        grUser.addQuery('title', 'Group Lead');
+        grUser.query();
+        if (grUser.next()) {
+            current.assigned_to = grUser.sys_id;
+        }
+    }
+
+})(current, previous);
